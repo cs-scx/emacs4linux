@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: show-message
+# key: msg
+# --
+
+(message "Hello form my yasnippet")$0
