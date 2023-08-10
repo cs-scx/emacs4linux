@@ -126,7 +126,7 @@
 (global-set-key (kbd "C-+") 'text-scale-increase)
 (global-set-key (kbd "C--") 'text-scale-decrease)
 
-(set-frame-parameter nil 'alpha '(80 .100))
+(set-frame-parameter nil 'alpha '(85 .100))
 ;; 设置光标样式
 (setq-default cursor-type 'box)
 ;; 去除默认启动界面
@@ -141,7 +141,7 @@
   (message "无法找到Fira Code Nerd Font字体，你可以更换其他字体或安装它让这条消息消失."))
 
 ;; 高亮当前行
-(global-hl-line-mode 1)
+(global-hl-line-mode -1)
 
 
 ;; 代码片段
@@ -334,11 +334,27 @@
 
 (use-package emmet-mode
   :ensure t
-  :hook (web-mode css-mode scss-mode sgml-mode)
+  :hook (web-mode css-mode scss-mode sgml-mode rjsx-mode)
   :config
   (add-hook 'emmet-mode-hook (lambda ()
                                (setq emmet-indent-after-insert t)))
   )
+
+;;
+;; eslint use local
+;;
+(defun my/use-eslint-from-node-modules ()
+  "Use local eslint from node_modules before global."
+  (let* ((root (locate-dominating-file
+                (or (buffer-file-name) default-directory)
+                "node_modules"))
+         (eslint (and root
+                      (expand-file-name "node_modules/eslint/bin/eslint.js"
+                                        root))))
+    (when (and eslint (file-executable-p eslint))
+      (setq-local flycheck-javascript-eslint-executable eslint))))
+
+(add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules)
 
 
 (use-package rjsx-mode
@@ -351,10 +367,52 @@
                               (my/use-eslint-from-node-modules)
                               (flycheck-select-checker 'javascript-eslint)
                               ))
-  (setq js2-basic-offset 2)
-  )
+  (setq js2-basic-offset 2))
+
+(use-package mode-local
+  :ensure t
+  :config
+  (setq-mode-local rjsx-mode emmet-expand-jsx-className? t)
+  (setq-mode-local web-mode emmet-expand-jsx-className? nil))
+  
+
+(use-package prettier-js
+  :ensure t
+  :hook ((js2-mode . prettier-js-mode))
+  :config
+  (setq prettier-js-args '(
+                           "--trailing-comma" "all"
+                           "--bracket-spacing" "false"
+                           )))
 
 (use-package react-snippets
+  :ensure t)
+
+
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1))
+
+(setq doom-modeline-height 25)
+(setq doom-modeline-height 1) ; optional
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(mode-line ((t (:family "Noto Sans" :height 1.0))))
+ '(mode-line-active ((t (:family "Noto Sans" :height 1.0))))
+ '(mode-line-inactive ((t (:family "Noto Sans" :height 1.0)))))
+
+(use-package 
+  all-the-icons 
+  :ensure t) 
+(use-package 
+  all-the-icons-dired 
+  :ensure t 
+  :hook ('dired-mode . 'all-the-icons-dired-mode)) 
+(use-package 
+  posframe 
   :ensure t)
 
 ;; 括号匹配
@@ -364,9 +422,124 @@
 ;;  :hook ('prog-mode . 'smartparens-global-mode))
 
 
-(load-theme 'manoj-dark)
+(load-theme 'manoj-dark t)
 
 (set-cursor-color "red")
+
+(use-package treemacs
+  :ensure t
+  :defer t
+  :init
+  (with-eval-after-load 'winum
+    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+  :config
+  (progn
+    (setq treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
+          treemacs-deferred-git-apply-delay        0.5
+          treemacs-directory-name-transformer      #'identity
+          treemacs-display-in-side-window          t
+          treemacs-eldoc-display                   'simple
+          treemacs-file-event-delay                2000
+          treemacs-file-extension-regex            treemacs-last-period-regex-value
+          treemacs-file-follow-delay               0.2
+          treemacs-file-name-transformer           #'identity
+          treemacs-follow-after-init               t
+          treemacs-expand-after-init               t
+          treemacs-find-workspace-method           'find-for-file-or-pick-first
+          treemacs-git-command-pipe                ""
+          treemacs-goto-tag-strategy               'refetch-index
+          treemacs-header-scroll-indicators        '(nil . "^^^^^^")
+          treemacs-hide-dot-git-directory          t
+          treemacs-indentation                     2
+          treemacs-indentation-string              " "
+          treemacs-is-never-other-window           nil
+          treemacs-max-git-entries                 5000
+          treemacs-missing-project-action          'ask
+          treemacs-move-forward-on-expand          nil
+          treemacs-no-png-images                   nil
+          treemacs-no-delete-other-windows         t
+          treemacs-project-follow-cleanup          nil
+          treemacs-persist-file                    (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+          treemacs-position                        'left
+          treemacs-read-string-input               'from-child-frame
+          treemacs-recenter-distance               0.1
+          treemacs-recenter-after-file-follow      nil
+          treemacs-recenter-after-tag-follow       nil
+          treemacs-recenter-after-project-jump     'always
+          treemacs-recenter-after-project-expand   'on-distance
+          treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
+          treemacs-project-follow-into-home        nil
+          treemacs-show-cursor                     nil
+          treemacs-show-hidden-files               t
+          treemacs-silent-filewatch                nil
+          treemacs-silent-refresh                  nil
+          treemacs-sorting                         'alphabetic-asc
+          treemacs-select-when-already-in-treemacs 'move-back
+          treemacs-space-between-root-nodes        t
+          treemacs-tag-follow-cleanup              t
+          treemacs-tag-follow-delay                1.5
+          treemacs-text-scale                      nil
+          treemacs-user-mode-line-format           nil
+          treemacs-user-header-line-format         nil
+          treemacs-wide-toggle-width               70
+          treemacs-width                           35
+          treemacs-width-increment                 1
+          treemacs-width-is-initially-locked       t
+          treemacs-workspace-switch-cleanup        nil)
+
+    ;; The default width and height of the icons is 22 pixels. If you are
+    ;; using a Hi-DPI display, uncomment this to double the icon size.
+    ;;(treemacs-resize-icons 44)
+
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode 'always)
+    (when treemacs-python-executable
+      (treemacs-git-commit-diff-mode t))
+
+    (pcase (cons (not (null (executable-find "git")))
+                 (not (null treemacs-python-executable)))
+      (`(t . t)
+       (treemacs-git-mode 'deferred))
+      (`(t . _)
+       (treemacs-git-mode 'simple)))
+
+    (treemacs-hide-gitignored-files-mode nil))
+  :bind
+  (:map global-map
+        ("M-0"       . treemacs-select-window)
+        ("C-x t 1"   . treemacs-delete-other-windows)
+        ("C-x t t"   . treemacs)
+        ("C-x t d"   . treemacs-select-directory)
+        ("C-x t B"   . treemacs-bookmark)
+        ("C-x t C-t" . treemacs-find-file)
+        ("C-x t M-t" . treemacs-find-tag)))
+
+(use-package treemacs-evil
+  :after (treemacs evil)
+  :ensure t)
+
+(use-package treemacs-projectile
+  :after (treemacs projectile)
+  :ensure t)
+
+(use-package treemacs-icons-dired
+  :hook (dired-mode . treemacs-icons-dired-enable-once)
+  :ensure t)
+
+(use-package treemacs-magit
+  :after (treemacs magit)
+  :ensure t)
+
+(use-package treemacs-persp ;;treemacs-perspective if you use perspective.el vs. persp-mode
+  :after (treemacs persp-mode) ;;or perspective vs. persp-mode
+  :ensure t
+  :config (treemacs-set-scope-type 'Perspectives))
+
+(use-package treemacs-tab-bar ;;treemacs-tab-bar if you use tab-bar-mode
+  :after (treemacs)
+  :ensure t
+  :config (treemacs-set-scope-type 'Tabs))
 
 (provide 'init)
 ;;; init.el ends here
@@ -376,10 +549,4 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(company-web react-snippets rjsx-mode emmet-mode web-mode which-key flycheck js2-mode company command-log-mode evil-leader evil linum-relative dashboard doom-themes scss-mode magit yasnippet-snippets yasnippet counsel use-package)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+   '(treemacs-tab-bar treemacs-persp treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil treemacs yasnippet-snippets which-key web-mode vterm use-package tide scss-mode rvm rufo ruby-electric rubocop rtags robe rjsx-mode restclient react-snippets py-autopep8 projectile-rails prettier-js posframe ox-reveal ox-gfm org2blog org-gcal org-download org-bullets omnisharp magit linum-relative irony-eldoc go-rename go-guru go-eldoc flycheck-irony evil-leader emmet-mode elpy doom-themes doom-modeline dashboard counsel company-web company-jedi company-irony-c-headers company-irony company-go command-log-mode cmake-mode cmake-ide clang-format all-the-icons-dired)))
