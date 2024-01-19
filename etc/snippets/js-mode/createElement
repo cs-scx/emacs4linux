@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: createElement
+# key: dec
+# --
+
+document.createElement($1)$0;

@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: test
+# key: test
+# --
+
+<div>${1:lll}</div>
+<div>${2:lll}</div>
+<div>${3:lll}</div>
+<div>${4:lll}</div>
+<div>${5:lll}</div>
+<div>${6:lll}</div>$0

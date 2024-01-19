@@ -1,0 +1,32 @@
+# -*- mode: snippet -*-
+# name: wrap-axios
+# key: wrapax
+# --
+
+import axios from 'axios'
+
+const ajax = axios.create({
+    timeout: 10000
+})
+
+
+ajax.interceptors.request.use(
+    config => {
+	return config
+    },
+    error => {
+	return Promise.reject(error.message);
+    }
+)
+
+ajax.interceptors.response.use(
+    response => {
+	return response.data
+    },
+    error => {
+	return Promise.reject(error.message);
+    }
+)
+
+
+export default ajax
