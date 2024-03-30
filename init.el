@@ -23,11 +23,12 @@
   ;;settings for terminal emacs
   (menu-bar-mode -1)
   (add-hook 'dired-mode-hook (lambda() (all-the-icons-dired-mode -1)))
-  (load-theme 'manoj-dark t))
+  )
 
 (if (display-graphic-p)
     (menu-bar-mode 1)
   (setup-for-nw))
+
 
 (global-auto-revert-mode 1)
 
@@ -162,12 +163,6 @@
   (setq dashboard-set-navigator t))
 
 
-(use-package linum-relative
-  ;;:disabled
-  :ensure t
-  :hook ('prog-mode . 'linum-relative-mode))
-
-
 (use-package evil
   :ensure t
   :config
@@ -260,8 +255,8 @@
   posframe
   :ensure t)
 
-(set-background-color "floralwhite")
-(set-cursor-color "darkgreen")
+;;(set-background-color "floralwhite")
+(set-cursor-color "red")
 
 (load-file "/home/scx/.emacs.d/custom/web.el")
 (load-file "/home/scx/.emacs.d/custom/gp.el")
@@ -302,20 +297,14 @@
 (use-package typescript-mode
   :ensure t)
 
+(add-hook 'prog-mode-hook (lambda () (menu-bar--display-line-numbers-mode-relative)))
+
+(use-package vterm
+  :ensure t)
+
+(if (display-graphic-p)
+    (load-theme 'doom-dark+ t)
+    (load-theme 'manoj-dark t))
+
 (provide 'init)
 ;;; init.el ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("e3daa8f18440301f3e54f2093fe15f4fe951986a8628e98dcd781efbec7a46f2" "467dc6fdebcf92f4d3e2a2016145ba15841987c71fbe675dcfe34ac47ffb9195" "aec7b55f2a13307a55517fdf08438863d694550565dee23181d2ebd973ebd6b8" "da75eceab6bea9298e04ce5b4b07349f8c02da305734f7c0c8c6af7b5eaa9738" default))
- '(package-selected-packages
-   '(typescript-mode doom-modeline lsp-ivy helm-lsp lsp-ui lsp-mode tide yasnippet-snippets which-key web-mode vue-mode use-package scss-mode s rjsx-mode react-snippets prettier-js posframe magit linum-relative flycheck evil-leader emmet-mode doom-themes dashboard counsel company command-log-mode all-the-icons-dired)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
