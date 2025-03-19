@@ -101,4 +101,4 @@
 
 (setq org-log-done 'time)  ;; 任务完成时记录时间戳
 (setq org-todo-keywords
-      '((sequence "TODO(t)" "IN-PROGRESS(i)" "|" "DONE(d@)" "CANCELED(c@)")))  ;; @添加备注
+      '((sequence "TODO(t!)" "IN-PROGRESS(i)" "|" "DONE(d@)" "CANCELED(c@)")))  ;; @表示添加备注 !表示添加时间
