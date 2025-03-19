@@ -98,5 +98,7 @@
 (add-hook 'before-save-hook (lambda () (file-to-disk)))
 (add-hook 'prog-mode-hook (lambda () (goto-latest-line)))
 
-;;(setq org-log-done 'time)  ;; 任务完成时记录时间戳
-(setq org-log-done 'note)  ;; 任务完成时提示输入日志
+
+(setq org-log-done 'time)  ;; 任务完成时记录时间戳
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "IN-PROGRESS(i)" "|" "DONE(d@)" "CANCELED(c@)")))  ;; @添加备注
